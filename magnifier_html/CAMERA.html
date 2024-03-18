@@ -1,0 +1,180 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Adjustable Webcam Access with Zoom</title>
+  <style>
+    body, html {
+      margin: 0;
+      padding: 0;
+      overflow: hidden;
+      font-family: Arial, sans-serif;
+      box-sizing: border-box;
+      border: 20px solid skyblue; /* Set the border color and width */
+    }
+
+    #video {
+      width: 100vw;
+      height: 100vh;
+      transition: transform 0.5s ease; /* Add transition for smooth zoom effect */
+    }
+
+    #controls {
+      position: fixed;
+      top: 10px;
+      left: 10px;
+    }
+
+    button {
+      padding: 10px 20px;
+      font-size: 16px;
+      cursor: pointer;
+      margin: 0 5px;
+    }
+    
+.btn {
+  padding: 0.6em 2em;
+  border: none;
+  outline: none;
+  color: rgb(255, 255, 255);
+  background: #111;
+  cursor: pointer;
+  position: relative;
+  z-index: 0;
+  border-radius: 10px;
+  user-select: none;
+  -webkit-user-select: none;
+  touch-action: manipulation;
+}
+
+.btn:before {
+  content: "";
+  background: linear-gradient(
+    45deg,
+    #ff0000,
+    #ff7300,
+    #fffb00,
+    #48ff00,
+    #00ffd5,
+    #002bff,
+    #7a00ff,
+    #ff00c8,
+    #ff0000
+  );
+  position: absolute;
+  top: -2px;
+  left: -2px;
+  background-size: 400%;
+  z-index: -1;
+  filter: blur(5px);
+  -webkit-filter: blur(5px);
+  width: calc(100% + 4px);
+  height: calc(100% + 4px);
+  animation: glowing-button-85 20s linear infinite;
+  transition: opacity 0.3s ease-in-out;
+  border-radius: 10px;
+}
+
+@keyframes glowing-button-85 {
+  0% {
+    background-position: 0 0;
+  }
+  50% {
+    background-position: 400% 0;
+  }
+  100% {
+    background-position: 0 0;
+  }
+}
+
+.btn:after {
+  z-index: -1;
+  content: "";
+  position: absolute;
+  width: 100%;
+  height: 100%;
+  background: #222;
+  left: 0;
+  top: 0;
+  border-radius: 10px;
+}
+.btn{
+	margin-top: 550px;
+	margin-left: 350px;
+}
+
+}
+  </style>
+
+</head>
+<body>
+<video id="video" autoplay></video>
+
+<div id="controls">
+  
+  <button class = "btn" onclick="zoomIn()">Zoom In</button>
+  <button class = "btn" onclick="zoomOut()">Zoom Out</button>
+</div>
+
+
+<script>
+  var videoElement = document.getElementById('video');
+  var scale = 1; // Initial scale
+
+  // Check if the browser supports getUserMedia
+  if (navigator.mediaDevices && navigator.mediaDevices.getUserMedia) {
+    // Access the user's camera
+    navigator.mediaDevices.getUserMedia({ video: true })
+      .then(function (stream) {
+        // Display the video stream in the video element
+        videoElement.srcObject = stream;
+        // Request fullscreen mode
+        requestFullscreen();
+      })
+      .catch(function (error) {
+        console.error('Error accessing the camera:', error);
+      });
+  } else {
+    console.error('getUserMedia is not supported in this browser');
+  }
+
+  function requestFullscreen() {
+    if (videoElement.requestFullscreen) {
+      videoElement.requestFullscreen();
+    } else if (videoElement.mozRequestFullScreen) { /* Firefox */
+      videoElement.mozRequestFullScreen();
+    } else if (videoElement.webkitRequestFullscreen) { /* Chrome, Safari and Opera */
+      videoElement.webkitRequestFullscreen();
+    } else if (videoElement.msRequestFullscreen) { /* IE/Edge */
+      videoElement.msRequestFullscreen();
+    }
+  }
+
+  function increaseSize() {
+    videoElement.style.width = (parseFloat(videoElement.style.width) + 10) + 'vw';
+    videoElement.style.height = (parseFloat(videoElement.style.height) + 10) + 'vh';
+  }
+
+  function decreaseSize() {
+    videoElement.style.width = (parseFloat(videoElement.style.width) - 10) + 'vw';
+    videoElement.style.height = (parseFloat(videoElement.style.height) - 10) + 'vh';
+  }
+
+  function zoomIn() {
+    scale += 0.1; // Increase scale
+    applyZoom();
+  }
+
+  function zoomOut() {
+    scale -= 0.1; // Decrease scale
+    applyZoom();
+  }
+
+  function applyZoom() {
+    videoElement.style.transform = 'scale(' + scale + ')';
+  }
+</script>
+
+</body>
+</html>

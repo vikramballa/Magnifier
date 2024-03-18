@@ -1,0 +1,236 @@
+<!DOCTYPE html>
+<html lang="en">
+
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Adjustable Webcam Access with Zoom</title>
+    <style>
+        body, html {
+            margin: 0;
+            padding: 0;
+            font-family: Arial, sans-serif;
+            box-sizing: border-box;
+            height: 100%;
+            background-color: #111; /* Set background color */
+            color: #fff; /* Set text color */
+        }
+
+        #video-container {
+            position: relative;
+            width: 100%;
+            height: 100vh;
+            overflow: hidden;
+        }
+
+        #video {
+            width: 100%;
+            height: auto;
+            transition: transform 0.5s ease;
+        }
+
+        #controls {
+            position: absolute;
+            bottom: 0;
+            left: 50%;
+            transform: translateX(-50%);
+            display: flex;
+            justify-content: space-around;
+            width: 80%;
+            margin-bottom: 20px;
+        }
+
+        .btn {
+            padding: 15px;
+            font-size: 16px;
+            cursor: pointer;
+            border: none;
+            border-radius: 50%;
+            color: #ffd700; /* Set text color to gold */
+            position: relative;
+            overflow: hidden;
+            margin: 0 5px;
+            transition: transform 0.3s ease, box-shadow 0.3s ease;
+        }
+
+        .btn:before,
+        .btn:after {
+            content: "";
+            position: absolute;
+            width: 100%;
+            height: 100%;
+            border-radius: 50%;
+            transition: opacity 0.3s ease-in-out;
+        }
+
+        .btn:hover {
+            transform: scale(1.1);
+            box-shadow: 0 0 10px rgba(255, 215, 0, 0.8); /* Set box-shadow color to gold */
+        }
+
+        @media only screen and (max-width: 768px) {
+            #controls {
+                width: 100%;
+            }
+        }
+
+        /* Button colors */
+        .btn[data-color="black"] {
+            background: #000; /* Set button background color to black */
+        }
+    </style>
+</head>
+
+<body>
+    <div id="video-container">
+        <video id="video" autoplay playsinline></video>
+        <div id="controls">
+            <button class="btn" data-color="black" onclick="zoomIn()">+</button>
+            <button class="btn" data-color="black" onclick="zoomOut()">-</button>
+            <button class="btn" data-color="black" onclick="applyNormal()">N</button>
+            <button class="btn" data-color="black" onclick="applyProtanopia()">P</button>
+            <button class="btn" data-color="black" onclick="applyDeuteranopia()">D</button>
+            <button class="btn" data-color="black" onclick="applyLightBlue()">LB</button>
+            <button class="btn" data-color="black" onclick="applyLightGreen()">LG</button>
+            <button class="btn" data-color="black" onclick="applyLightPink()">LP</button>
+            <button class="btn" data-color="black" onclick="applyLightYellow()">LY</button>
+            <button class="btn" data-color="black" onclick="toggleFullscreen()">Toggle Fullscreen</button>
+        </div>
+    </div>
+
+    <script>
+        var videoElement = document.getElementById('video');
+        var scale = 1; // Initial scale
+
+        // Check if the browser supports getUserMedia
+        if (navigator.mediaDevices && navigator.mediaDevices.getUserMedia) {
+            // Access the user's camera
+            navigator.mediaDevices.getUserMedia({
+                    video: { facingMode: 'environment' } // Use the primary camera on mobile devices
+                })
+                .then(function (stream) {
+                    // Display the video stream in the video element
+                    videoElement.srcObject = stream;
+                    // Request fullscreen mode
+                    requestFullscreen();
+                })
+                .catch(function (error) {
+                    console.error('Error accessing the camera:', error);
+                });
+        } else {
+            console.error('getUserMedia is not supported in this browser');
+        }
+
+        function requestFullscreen() {
+            const videoContainer = document.getElementById('video-container');
+            if (videoContainer.requestFullscreen) {
+                videoContainer.requestFullscreen();
+            } else if (videoContainer.mozRequestFullScreen) { /* Firefox */
+                videoContainer.mozRequestFullScreen();
+            } else if (videoContainer.webkitRequestFullscreen) { /* Chrome, Safari and Opera */
+                videoContainer.webkitRequestFullscreen();
+            } else if (videoContainer.msRequestFullscreen) { /* IE/Edge */
+                videoContainer.msRequestFullscreen();
+            }
+        }
+
+        function toggleFullscreen() {
+            if (!document.fullscreenElement) {
+                requestFullscreen();
+            } else {
+                exitFullscreen();
+            }
+        }
+
+        function exitFullscreen() {
+            if (document.exitFullscreen) {
+                document.exitFullscreen();
+            } else if (document.mozCancelFullScreen) { /* Firefox */
+                document.mozCancelFullScreen();
+            } else if (document.webkitExitFullscreen) { /* Chrome, Safari and Opera */
+                document.webkitExitFullscreen();
+            } else if (document.msExitFullscreen) { /* IE/Edge */
+                document.msExitFullscreen();
+            }
+        }
+
+        function zoomIn() {
+            scale += 0.1; // Increase scale
+            applyZoom();
+        }
+
+        function zoomOut() {
+            scale -= 0.1; // Decrease scale
+            applyZoom();
+        }
+
+        function applyZoom() {
+            videoElement.style.transform = 'scale(' + scale + ')';
+        }
+
+        function applyNormal() {
+            videoElement.style.filter = 'none';
+        }
+
+        function applyProtanopia() {
+            videoElement.style.filter = 'url(#protanopia)';
+        }
+
+        function applyDeuteranopia() {
+            videoElement.style.filter = 'url(#deuteranopia)';
+        }
+
+        function applyLightBlue() {
+            videoElement.style.filter = 'url(#lightblue)';
+        }
+
+        function applyLightGreen() {
+            videoElement.style.filter = 'url(#lightgreen)';
+        }
+
+        function applyLightPink() {
+            videoElement.style.filter = 'url(#lightpink)';
+        }
+
+        function applyLightYellow() {
+            videoElement.style.filter = 'url(#lightyellow)';
+        }
+    </script>
+
+    <!-- Color blindness filters -->
+    <svg xmlns="http://www.w3.org/2000/svg" version="1.1">
+        <defs>
+            <!-- Protanopia (red-green color blindness) -->
+            <filter id="protanopia" color-interpolation-filters="sRGB">
+                <feColorMatrix type="matrix" values="0.567 0.433 0 0 0 0.558 0.442 0 0 0 0 0 0 0 0 0 0 0 1 0" />
+            </filter>
+
+            <!-- Deuteranopia (green-red color blindness) -->
+            <filter id="deuteranopia" color-interpolation-filters="sRGB">
+                <feColorMatrix type="matrix" values="0.625 0.375 0 0 0 0.7 0.3 0 0 0 0 0 0 0 0 0 0 0 1 0" />
+            </filter>
+
+            <!-- Light Blue -->
+            <filter id="lightblue" color-interpolation-filters="sRGB">
+                <feColorMatrix type="matrix" values="0.8 0.8 0 0 0 0 0.8 0.8 0 0 0 0 0 0 1 0 0 0 1 0" />
+            </filter>
+
+            <!-- Light Green -->
+            <filter id="lightgreen" color-interpolation-filters="sRGB">
+                <feColorMatrix type="matrix" values="0.8 0 0 0 0 0.2 0.8 0 0 0 0 0 0 0.8 0 0 0 0 1 0" />
+            </filter>
+
+            <!-- Light Pink -->
+            <filter id="lightpink" color-interpolation-filters="sRGB">
+                <feColorMatrix type="matrix" values="0.9 0.6 0.6 0 0 0.4 0.8 0.8 0 0 0.4 0.6 0.9 0.9 0 0 0 0 1 0" />
+            </filter>
+
+            <!-- Light Yellow -->
+            <filter id="lightyellow" color-interpolation-filters="sRGB">
+                <feColorMatrix type="matrix" values="1 1 0.6 0 0 0 1 0.6 0 0 0 0 1 0.6 0 0 0 0 1 0" />
+            </filter>
+        </defs>
+    </svg>
+</body>
+
+</html>
